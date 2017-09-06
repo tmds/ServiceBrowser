@@ -24,3 +24,12 @@ polkit.addRule(function(action, subject) {
 **Security Considerations**
 
 Anyone with access to the website will be able to see and control the services. Only run this on your personal machine on localhost.
+
+## Running the demo
+
+```
+$ git clone https://github.com/tmds/ServiceBrowser.git
+$ cd ServiceBrowser/src/ServiceBrowser/
+$ dotnet run
+```
+Now open your browser at: `http://localhost:5000/`.
