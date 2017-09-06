@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Services</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"></script>
+    <script>
+        function ViewModel() {
+            var self = this;
+            self.services = ko.observable([]);
+            self.currentFilter = ko.observable();
+            self.filterServices = ko.computed(function() {
+                if(!self.currentFilter()) {
+                    return self.services(); 
+                } else {
+                    return ko.utils.arrayFilter(self.services(), function(service) {
+                        return service.name.indexOf(self.currentFilter()) !== -1
+                    });
+                }
+            });
+        }
+        var viewModel = new ViewModel();
+        function startService(service) {
+            $.ajax({
+                type: "post", url: "/api/unit/" + service.id + "/start",
+                success: null,
+                error: function (request, status, error) {
+                    alert(JSON.parse(request.responseText).message);
+                }
+            });
+        }
+        function stopService(service) {
+            $.ajax({
+                type: "post", url: "/api/unit/" + service.id + "/stop",
+                success: null,
+                error: function (request, status, error) {
+                    alert(JSON.parse(request.responseText).message);
+                }
+            });
+        }
+        function refreshServices() {
+            $.ajax({
+                dataType: "json",
+                url: "/api/unit/services",
+                success: function (data) {
+                    viewModel.services(data);
+                    setTimeout(refreshServices, 1000);
+                },
+                error: function (request, status, error) {
+                    viewModel.services([]);
+                    alert(JSON.parse(request.responseText).message);
+                }
+            });
+        }
+        $(document).ready(function() {
+            ko.applyBindings(viewModel);
+            refreshServices();
+        })
+    </script>
+    <style type="text/css">
+        a:hover {
+            cursor:pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+<h2>Services</h2>
+Filter: <input data-bind="textInput: currentFilter" />
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="col-md-2">Name</th>
+            <th class="col-md-6">Description</th>
+            <th class="col-md-2">Status</th>
+            <th class="col-md-2">Startup</th>
+        </tr>
+    </thead>
+    <tbody data-bind="foreach: filterServices">
+        <tr>
+            <td>
+                <span data-bind="text:name"></span>
+                <a data-bind="click: startService, visible: status != 'active'">start</a>
+                <a data-bind="click: stopService, visible: status != 'inactive'">stop</a>
+            </td>
+            <td data-bind="text:description"></td>
+            <td data-bind="text:status"></td>
+            <td data-bind="text:startup"></td>
+        </tr>
+    </tbody>
+</table>
+</div>
+</body>
+</html>
