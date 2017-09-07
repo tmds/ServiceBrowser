@@ -33,3 +33,7 @@ $ cd ServiceBrowser/src/ServiceBrowser/
 $ dotnet run
 ```
 Now open your browser at: `http://localhost:5000/`.
+
+## Screenshot
+
+![Screenshot](/screenshot.png?raw=true)
